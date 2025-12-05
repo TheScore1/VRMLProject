@@ -5727,6 +5727,57 @@ Transform:
   - {fileID: 767946303}
   m_Father: {fileID: 1800722116}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &393054210
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 393054212}
+  - component: {fileID: 393054213}
+  m_Layer: 0
+  m_Name: GemmaObejct
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &393054212
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 393054210}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.251, y: 0.57100004, z: 2.302}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &393054213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 393054210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc509f5e2a38368408f2661598db2e4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pythonPath: python
+  serverScriptPath: main.py
+  arguments: --host 127.0.0.1 --port 5000
+  showConsoleWindow: 0
+  autoStartOnPlay: 1
+  logOutput: 1
+  logErrors: 1
 --- !u!1 &405357742
 GameObject:
   m_ObjectHideFlags: 0
@@ -32966,3 +33017,4 @@ SceneRoots:
   - {fileID: 503346890}
   - {fileID: 405357743}
   - {fileID: 1455920198}
+  - {fileID: 393054212}

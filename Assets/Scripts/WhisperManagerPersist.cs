@@ -2,6 +2,7 @@ using UnityEngine;
 using Whisper;
 using Whisper.Utils;
 
+// Класс нужен для инициализации whisper в меню, а не на сцене с выступлением
 public class WhisperManagerPersist : MonoBehaviour
 {
     private static WhisperManagerPersist instance;
@@ -11,13 +12,11 @@ public class WhisperManagerPersist : MonoBehaviour
 
     void Awake()
     {
-        // Реализуем синглтон
         if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Также сохраняем WhisperManager
             if (whisperManager != null)
             {
                 DontDestroyOnLoad(whisperManager.gameObject);
@@ -25,7 +24,6 @@ public class WhisperManagerPersist : MonoBehaviour
         }
         else
         {
-            // Если уже существует экземпляр, уничтожаем этот
             Destroy(gameObject);
             if (whisperManager != null)
             {
@@ -38,7 +36,6 @@ public class WhisperManagerPersist : MonoBehaviour
     {
         if (instance == null)
         {
-            // Ищем существующий экземпляр на сцене
             instance = FindFirstObjectByType<WhisperManagerPersist>();
         }
         return instance?.whisperManager;

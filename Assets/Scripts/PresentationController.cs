@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Whisper.Samples;
 
 public class PresentationController : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class PresentationController : MonoBehaviour
     string pptxName = "Example.pptx";
 
     [SerializeField] GameObject[] planesToDisplay;
+
+    [SerializeField] private WhisperAudio whisperAudio;
 
     [Header("Settings")]
     public PresentationSettings settings;
@@ -28,6 +31,21 @@ public class PresentationController : MonoBehaviour
             return;
         }
 
+        if (whisperAudio == null)
+        {
+            whisperAudio = FindObjectOfType<WhisperAudio>();
+        }
+        
+        if (whisperAudio != null)
+        {
+            // Подписываемся на событие
+            whisperAudio.OnTranscriptionComplete += HandleTranscriptionComplete;
+        }
+        else
+        {
+            Debug.LogError("WhisperAudio not found!");
+        }
+
         pptxName = settings.selectedPptxName;
         UnityEngine.Debug.Log($"Запускаем презентацию: {pptxName}");
 
@@ -40,6 +58,12 @@ public class PresentationController : MonoBehaviour
 
         // Показываем первый слайд
         ShowCurrentSlide();
+    }
+
+    private void HandleTranscriptionComplete(string transcribedText)
+    {
+        // Обрабатываем распознанный текст
+        Debug.Log($"Получен текст из TranscriptionProcessor: {transcribedText}");
     }
 
     void LoadSlideTextures()

@@ -29,6 +29,8 @@ namespace Whisper.Samples
         public TextMeshProUGUI outputText;
         public TextMeshProUGUI timeText;
 
+        public event Action<string> OnTranscriptionComplete;
+
         private string _buffer;
         private bool _isTranscribing = false;
         private AudioClip _lastRecordedClip;
@@ -147,12 +149,10 @@ namespace Whisper.Samples
                 return;
             }
 
-            // Проверяем, загружена ли модель
             if (!manager.IsLoaded)
             {
                 UnityEngine.Debug.LogWarning("Whisper model is not loaded yet. Waiting...");
 
-                // Ждем загрузки модели
                 float timeout = 10f;
                 float startTime = Time.time;
                 while (!manager.IsLoaded && (Time.time - startTime) < timeout)
@@ -195,6 +195,8 @@ namespace Whisper.Samples
                     text += $"\n\nLanguage: {res.Language}";
 
                 UnityEngine.Debug.Log($"Transcription completed: {text}");
+
+                OnTranscriptionComplete?.Invoke(text);
             }
             catch (System.Exception e)
             {

@@ -5,4 +5,6 @@ public class PresentationSettings : ScriptableObject
 {
     public string selectedPptxName;
     public bool useVAD = true;
+
+    public string debugSpeechText;
 }
