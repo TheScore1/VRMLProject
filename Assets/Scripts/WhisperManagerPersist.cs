@@ -2,7 +2,6 @@ using UnityEngine;
 using Whisper;
 using Whisper.Utils;
 
-// Класс нужен для инициализации whisper в меню, а не на сцене с выступлением
 public class WhisperManagerPersist : MonoBehaviour
 {
     private static WhisperManagerPersist instance;

@@ -96,19 +96,12 @@ public class LoadingManager : MonoBehaviour
     {
         Debug.Log("Starting background loading...");
 
-        // Дать UI время отрисоваться
         yield return null;
         yield return null;
 
-        // ------------------------------------------------------------
-        // 1) СНАЧАЛА грузим Whisper + LibreOffice + Poppler
-        // ------------------------------------------------------------
-
-        // --- LibreOffice ---
         yield return StartCoroutine(LoadLibreOfficeAndConvertCoroutine());
         RemoveStep("LibreOffice");
 
-        // --- Poppler ---
         string pdfFile = Path.Combine(
             outputPath,
             Path.GetFileNameWithoutExtension(presentationPath) + ".pdf"
@@ -124,13 +117,8 @@ public class LoadingManager : MonoBehaviour
             RemoveStep("Poppler");
         }
 
-        // --- Whisper ---
         yield return StartCoroutine(LoadWhisperModelCoroutine());
         RemoveStep("Whisper Model");
-
-        // ------------------------------------------------------------
-        // 2) ТЕПЕРЬ начинаем загрузку сцены
-        // ------------------------------------------------------------
 
         Debug.Log("Starting async scene loading...");
 
@@ -138,17 +126,11 @@ public class LoadingManager : MonoBehaviour
             SceneManager.LoadSceneAsync("MainScene");
         sceneLoadOperation.allowSceneActivation = false;
 
-        // ------------------------------------------------------------
-        // 3) Ждём, пока сцена полностью загрузится (до 0.9)
-        // ------------------------------------------------------------
-
         yield return StartCoroutine(WaitForScenePreload(sceneLoadOperation));
         RemoveStep("Scene");
 
-        // ещё чуть-чуть задержка для мягкой активации
         yield return new WaitForSeconds(0.3f);
 
-        // Активируем сцену
         sceneLoadOperation.allowSceneActivation = true;
 
         Debug.Log("All loading completed, activating scene...");
@@ -173,10 +155,8 @@ public class LoadingManager : MonoBehaviour
             yield break;
         }
 
-        // Очищаем выходную папку асинхронно
         yield return StartCoroutine(CleanOutputDirectoryCoroutine());
 
-        // Запускаем LibreOffice процесс
         bool conversionSuccess = false;
         yield return StartCoroutine(RunLibreOfficeProcessCoroutine(filePath, success => {
             conversionSuccess = success;
@@ -225,7 +205,7 @@ public class LoadingManager : MonoBehaviour
                     string output = process.StandardOutput.ReadToEnd();
                     string error = process.StandardError.ReadToEnd();
 
-                    bool exited = process.WaitForExit(60000); // 60 секунд таймаут
+                    bool exited = process.WaitForExit(60000);
 
                     if (!exited)
                     {
@@ -245,7 +225,6 @@ public class LoadingManager : MonoBehaviour
                             Debug.Log($"LibreOffice output: {output}");
                         }
 
-                        // Проверяем, создался ли PDF файл
                         string pdfFile = Path.Combine(outputPath, Path.GetFileNameWithoutExtension(filePath) + ".pdf");
                         bool success = File.Exists(pdfFile);
 
@@ -281,7 +260,6 @@ public class LoadingManager : MonoBehaviour
     {
         string pdfFile = Path.Combine(outputPath, Path.GetFileNameWithoutExtension(presentationPath) + ".pdf");
 
-        // Дополнительная проверка существования PDF файла
         if (!File.Exists(pdfFile))
         {
             Debug.LogError($"PDF файл не существует: {pdfFile}");
@@ -303,7 +281,6 @@ public class LoadingManager : MonoBehaviour
         {
             Debug.Log("Poppler conversion completed successfully");
 
-            // Проверяем созданные PNG файлы
             string[] pngFiles = Directory.GetFiles(outputPath, "*.png");
             Debug.Log($"Created {pngFiles.Length} PNG files");
         }
@@ -342,7 +319,7 @@ public class LoadingManager : MonoBehaviour
                     string output = process.StandardOutput.ReadToEnd();
                     string error = process.StandardError.ReadToEnd();
 
-                    bool exited = process.WaitForExit(30000); // 30 секунд таймаут
+                    bool exited = process.WaitForExit(30000);
 
                     if (!exited)
                     {
@@ -362,7 +339,6 @@ public class LoadingManager : MonoBehaviour
                             Debug.Log($"Poppler output: {output}");
                         }
 
-                        // Проверяем, создались ли PNG файлы
                         string[] pngFiles = Directory.GetFiles(outputPath, "*.png");
                         tcs.SetResult(pngFiles.Length > 0);
                     }
@@ -443,7 +419,6 @@ public class LoadingManager : MonoBehaviour
         if (whisperManager.IsLoading)
         {
             Debug.Log("Whisper model is already loading, waiting...");
-            // Ждём загрузки, но с timeout
             yield return StartCoroutine(WaitForWhisperLoadCoroutine());
             yield break;
         }
@@ -459,7 +434,6 @@ public class LoadingManager : MonoBehaviour
             yield break;
         }
 
-        // дождёмся реального состояния IsLoaded (внутри InitModel может быть асинхронная цепочка)
         yield return StartCoroutine(WaitForWhisperLoadCoroutine());
 
         if (whisperManager.IsLoaded)
@@ -493,7 +467,6 @@ public class LoadingManager : MonoBehaviour
             yield break;
         }
 
-        // Ждём завершения task без блокировки main thread
         while (!initTask.IsCompleted)
         {
             yield return null;
@@ -513,7 +486,6 @@ public class LoadingManager : MonoBehaviour
         }
         else
         {
-            // InitModel завершился (успех/ошибка внутри InitModel выставит IsLoaded/IsLoading)
             success = true;
         }
 
@@ -535,14 +507,13 @@ public class LoadingManager : MonoBehaviour
                 yield break;
             }
 
-            // логируем каждые 2 секунды
             if (Time.time - lastLogTime > 2f)
             {
                 Debug.Log($"Waiting for Whisper model... IsLoading: {whisperManager.IsLoading}, IsLoaded: {whisperManager.IsLoaded}");
                 lastLogTime = Time.time;
             }
 
-            yield return null; // более плавно, чем WaitForSeconds
+            yield return null;
         }
 
         if (!whisperManager.IsLoaded)

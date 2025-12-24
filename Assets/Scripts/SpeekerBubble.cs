@@ -5,13 +5,26 @@ public class SpeakerBubble : MonoBehaviour
 {
     [Header("Bubble Elements")]
     [SerializeField] private GameObject bubbleObject;
-    [SerializeField] private Vector2 offset = new Vector2(0, 1.0f);
+    [SerializeField] private GameObject[] NPCOrigins;
+    [SerializeField] private Vector3 offset = new Vector3(0, -1.0f, 0);
+
+    [Header("UI For Output")]
+    [SerializeField] private TextMeshProUGUI Text;
 
     private TextMeshPro textMesh;
     private Transform targetPoint;
+    private System.Random rand;
 
     private void Awake()
     {
+        rand = new System.Random();
+
+        if (NPCOrigins.Length == 0)
+        {
+            Debug.Log("Массив позиций нпс пуст. Return");
+            return;
+        }
+
         if (bubbleObject != null)
             bubbleObject.SetActive(false);
 
@@ -26,6 +39,8 @@ public class SpeakerBubble : MonoBehaviour
     {
         if (textMesh != null)
             textMesh.text = text;
+        if (bubbleObject.activeSelf == false)
+            Show();
     }
 
     public void Show()
@@ -44,9 +59,14 @@ public class SpeakerBubble : MonoBehaviour
     {
         if (bubbleObject == null) return;
 
-        Vector3 adjusted = worldPosition + new Vector3(offset.x, offset.y, 0f);
+        Vector3 adjusted = new Vector3(worldPosition.x, worldPosition.y, worldPosition.z) + new Vector3(offset.x, offset.y, offset.z);
 
         bubbleObject.transform.position = adjusted;
+    }
+
+    public void SetRandomizedPosition()
+    {
+        targetPoint = NPCOrigins[rand.Next(0, NPCOrigins.Length - 1)].transform;
     }
 
     public void AttachTo(Transform target)

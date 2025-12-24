@@ -33,12 +33,11 @@ public class PresentationController : MonoBehaviour
 
         if (whisperAudio == null)
         {
-            whisperAudio = FindObjectOfType<WhisperAudio>();
+            whisperAudio = FindAnyObjectByType<WhisperAudio>();
         }
         
         if (whisperAudio != null)
         {
-            // Подписываемся на событие
             whisperAudio.OnTranscriptionComplete += HandleTranscriptionComplete;
         }
         else
@@ -53,16 +52,13 @@ public class PresentationController : MonoBehaviour
         presentationsPath = Path.Combine(rootDir, "Presentations");
         outputPath = Path.Combine(presentationsPath, "Output");
 
-        // Только загружаем готовые текстуры, конвертация уже выполнена в меню
         LoadSlideTextures();
 
-        // Показываем первый слайд
         ShowCurrentSlide();
     }
 
     private void HandleTranscriptionComplete(string transcribedText)
     {
-        // Обрабатываем распознанный текст
         Debug.Log($"Получен текст из TranscriptionProcessor: {transcribedText}");
     }
 
@@ -119,7 +115,6 @@ public class PresentationController : MonoBehaviour
 
     public int TotalSlides => slideTextures.Count;
 
-    // Методы для переключения слайдов
     public void NextSlide()
     {
         if (slideTextures.Count == 0) return;

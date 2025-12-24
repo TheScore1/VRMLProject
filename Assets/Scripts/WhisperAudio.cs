@@ -17,7 +17,7 @@ namespace Whisper.Samples
         public bool printLanguage = false;
 
         [Header("Microphone Recorder")]
-        public MicrophoneRecorderWithVAD recorder;
+        public MicrophoneRecorder recorder;
 
         [Header("UI - Status")]
         public TextMeshProUGUI recordingStatusText;
@@ -33,18 +33,17 @@ namespace Whisper.Samples
 
         private string _buffer;
         private bool _isTranscribing = false;
-        private AudioClip _lastRecordedClip;
+        public AudioClip _lastRecordedClip;
+        public string _lastTranscribedClip;
         private bool _isRecording = false;
 
         private void Awake()
         {
-            // Пытаемся найти WhisperManager через WhisperScenePersist, если не назначен в инспекторе
             if (manager == null)
             {
                 manager = WhisperManagerPersist.GetWhisperManager();
                 if (manager == null)
                 {
-                    // Если не нашли через persist, ищем в сцене
                     manager = FindFirstObjectByType<WhisperManager>();
                 }
             }
@@ -65,7 +64,7 @@ namespace Whisper.Samples
         {
             if (recorder == null)
             {
-                recorder = FindFirstObjectByType<MicrophoneRecorderWithVAD>();
+                recorder = FindFirstObjectByType<MicrophoneRecorder>();
                 UnityEngine.Debug.Log(recorder != null ? "Found recorder in Start" : "Recorder not found");
             }
 
@@ -79,6 +78,11 @@ namespace Whisper.Samples
         private void Update()
         {
             UpdateUIStatus();
+        }
+
+        public bool IsTranscribing()
+        {
+            return _isTranscribing;
         }
 
         private void UpdateUIStatus()
@@ -149,6 +153,8 @@ namespace Whisper.Samples
                 return;
             }
 
+            MicrophoneStateManager.IsProcessing = true;
+
             if (!manager.IsLoaded)
             {
                 UnityEngine.Debug.LogWarning("Whisper model is not loaded yet. Waiting...");
@@ -163,6 +169,7 @@ namespace Whisper.Samples
                 if (!manager.IsLoaded)
                 {
                     UnityEngine.Debug.LogError("Whisper model failed to load within timeout");
+                    MicrophoneStateManager.IsProcessing = false;
                     return;
                 }
             }
@@ -179,6 +186,7 @@ namespace Whisper.Samples
                 if (res == null)
                 {
                     UnityEngine.Debug.LogWarning("Transcription returned null result");
+                    MicrophoneStateManager.IsProcessing = false;
                     return;
                 }
 
@@ -194,16 +202,22 @@ namespace Whisper.Samples
                 if (printLanguage)
                     text += $"\n\nLanguage: {res.Language}";
 
+                _lastTranscribedClip = text;
+
                 UnityEngine.Debug.Log($"Transcription completed: {text}");
+
+                MicrophoneStateManager.IsProcessing = false;
 
                 OnTranscriptionComplete?.Invoke(text);
             }
             catch (System.Exception e)
             {
                 UnityEngine.Debug.LogError($"Transcription failed: {e.Message}");
+                MicrophoneStateManager.IsProcessing = false;
             }
             finally
             {
+                MicrophoneStateManager.IsProcessing = false;
                 _isTranscribing = false;
             }
         }

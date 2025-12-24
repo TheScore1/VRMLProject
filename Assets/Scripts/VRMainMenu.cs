@@ -50,17 +50,14 @@ public class VRMainMenuUI : MonoBehaviour
 
         RefreshPresentationsList();
 
-        // Предзагрузка путей и проверка доступности
         PreloadDependencies();
     }
 
     private void PreloadDependencies()
     {
-        // Предварительная инициализация путей
         string rootDir = Directory.GetParent(Application.dataPath).FullName;
         string presentationsPath = Path.Combine(rootDir, "Presentations");
 
-        // Создаем папку если не существует
         if (!Directory.Exists(presentationsPath))
         {
             Directory.CreateDirectory(presentationsPath);
@@ -135,14 +132,12 @@ public class VRMainMenuUI : MonoBehaviour
 
         if (File.Exists(fullPath))
         {
-            // Запускаем загрузку в фоне через LoadingManager
             if (loadingManager != null)
             {
                 loadingManager.StartLoading(fullPath);
             }
             else
             {
-                // Если LoadingManager не назначен, загружаем сцену сразу
                 Debug.LogWarning("LoadingManager not assigned, loading scene directly");
                 SceneManager.LoadScene("MainScene");
             }

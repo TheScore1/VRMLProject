@@ -28,6 +28,8 @@ public class PresControllerGrabHandler : MonoBehaviour
 
         if (remoteCopy != null) remoteCopy.SetActive(false);
         if (vrControllerVisual != null) vrControllerVisual.SetActive(true);
+
+        MicrophoneStateManager.IsRemoteHeld = false;
     }
 
     void OnDestroy()
@@ -41,6 +43,8 @@ public class PresControllerGrabHandler : MonoBehaviour
         if (vrControllerVisual != null) vrControllerVisual.SetActive(false);
 
         if (remoteCopy != null) remoteCopy.SetActive(true);
+
+        MicrophoneStateManager.IsRemoteHeld = true;
 
         gameObject.SetActive(false);
     }
